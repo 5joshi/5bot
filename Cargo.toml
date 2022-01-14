@@ -1,0 +1,50 @@
+[package]
+name = "fivebot"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[dependencies]
+async-trait = "0.1"
+chrono = { version = "0.4", features = ["serde"] }
+dashmap = "4.0"
+dotenv = "0.15.0"
+flexi_logger = { version = "0.19", default-features = false, features = [
+    "colors",
+    "specfile",
+    "compress",
+] }
+futures = "0.3.17"
+hashbrown = "0.11"
+irc = "0.15"
+lazy_static = "1.4.0"
+log = "0.4.0"
+once_cell = "1.4"
+parking_lot = { version = "0.11", default-features = false, features = [
+    "send_guard",
+] }
+prometheus = "0.12"
+rand = "0.8.4"
+regex = "1.5.4"
+rosu-v2 = { version = "0.2", features = ["cache", "metrics"] }
+slash_command_macro = { path = "./slash_command_macro" }
+songbird = { version = "0.2.0", default-features = false, features = [
+    "builtin-queue",
+    "driver",
+    "twilight-rustls",
+    "zlib-stock",
+] }
+sqlx = { version = "0.5", default-features = false, features = [
+    "chrono",
+    "json",
+    "macros",
+    "migrate",
+    "postgres",
+    "runtime-tokio-native-tls",
+] }
+tokio = { version = "1.11.0", features = ["full"] }
+twilight-cache-inmemory = "0.7"
+twilight-gateway = "0.7"
+twilight-http = "0.7"
+twilight-model = "0.7"
+twilight-standby = "0.7"
