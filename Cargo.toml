@@ -28,6 +28,12 @@ rand = "0.8.4"
 regex = "1.5.4"
 rosu-v2 = { version = "0.2", features = ["cache", "metrics"] }
 slash_command_macro = { path = "./slash_command_macro" }
+# songbird = { git = "https://github.com/adumbidiot/songbird", branch = "audiopus-0.3.0", default-features = false, features = [
+#     "builtin-queue",
+#     "driver",
+#     "twilight-rustls",
+#     "zlib-stock",
+# ] }
 songbird = { version = "0.2.0", default-features = false, features = [
     "builtin-queue",
     "driver",
@@ -42,9 +48,17 @@ sqlx = { version = "0.5", default-features = false, features = [
     "postgres",
     "runtime-tokio-native-tls",
 ] }
+time = { version = "0.3", features = ["macros", "parsing"] }
 tokio = { version = "1.11.0", features = ["full"] }
-twilight-cache-inmemory = "0.7"
-twilight-gateway = "0.7"
-twilight-http = "0.7"
-twilight-model = "0.7"
-twilight-standby = "0.7"
+twilight-cache-inmemory = "0.6"
+twilight-gateway = "0.6"
+twilight-http = "0.6"
+twilight-model = "0.6"
+twilight-standby = "0.6"
+
+[features]
+vendored-openssl = ["openssl/vendored"]
+
+[dependencies.openssl]
+version = "0.10"
+optional = true

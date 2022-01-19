@@ -3,11 +3,9 @@ use std::sync::Arc;
 use rand::Rng;
 use twilight_model::application::{
     callback::{CallbackData, InteractionResponse},
-    command::{
-        CommandOption, CommandOptionValue as CommandOptionValueLiteral, NumberCommandOptionData,
-    },
+    command::{ChoiceCommandOptionData, CommandOption},
     interaction::{
-        application_command::{CommandData, CommandOptionValue},
+        application_command::{CommandData, CommandDataOption},
         ApplicationCommand,
     },
 };
@@ -25,11 +23,11 @@ pub struct RollArgs {
 }
 
 impl RollArgs {
-    async fn parse_options(_: Arc<Context>, data: &mut CommandData) -> BotResult<Self> {
+    async fn parse_options(_: Arc<Context>, data: CommandData) -> BotResult<Self> {
         let mut limit: u64 = 100;
-        for option in data.options.iter() {
-            if let CommandOptionValue::Integer(value) = option.value {
-                if option.name == "limit" {
+        for option in data.options {
+            if let CommandDataOption::Integer { name, value } = option {
+                if name == "limit" {
                     limit = value.max(0) as u64;
                 }
             }
@@ -39,12 +37,9 @@ impl RollArgs {
 }
 
 fn roll_options() -> Vec<CommandOption> {
-    let option_data = NumberCommandOptionData {
-        autocomplete: false,
+    let option_data = ChoiceCommandOptionData {
         choices: vec![],
         description: "Specify an upper limit, defaults to 100".to_string(),
-        min_value: Some(CommandOptionValueLiteral::Integer(0)),
-        max_value: None,
         name: "limit".to_string(),
         required: false,
     };

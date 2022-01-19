@@ -8,7 +8,7 @@ use twilight_model::{
     application::{
         command::{ChoiceCommandOptionData, CommandOption},
         interaction::{
-            application_command::{CommandData, CommandOptionValue},
+            application_command::{CommandData, CommandDataOption},
             ApplicationCommand,
         },
     },
@@ -32,11 +32,11 @@ pub struct PlayArgs {
 }
 
 impl PlayArgs {
-    async fn parse_options(_: Arc<Context>, data: &mut CommandData) -> BotResult<Self> {
-        for option in data.options.drain(..) {
-            if let CommandOptionValue::String(song) = option.value {
-                if option.name == "song" {
-                    return Ok(Self { song });
+    async fn parse_options(_: Arc<Context>, data: CommandData) -> BotResult<Self> {
+        for option in data.options {
+            if let CommandDataOption::String { name, value } = option {
+                if name == "song" {
+                    return Ok(Self { song: value });
                 }
             }
         }
@@ -47,7 +47,6 @@ impl PlayArgs {
 
 fn play_options() -> Vec<CommandOption> {
     let option_data = ChoiceCommandOptionData {
-        autocomplete: false,
         choices: vec![],
         description: "Specify a song name or youtube url".to_string(),
         name: "song".to_string(),
@@ -75,7 +74,7 @@ pub async fn play(ctx: Arc<Context>, command: ApplicationCommand, args: PlayArgs
         }
     };
 
-    let (_handle, success) = ctx.songbird.join(guild_id.get(), channel_id.get()).await;
+    let (_handle, success) = ctx.songbird.join(guild_id, channel_id).await;
 
     if let Err(success) = success {
         let builder = MessageBuilder::new().error("Failed to join voice channel! Blame Joshi :c");
@@ -105,7 +104,7 @@ pub async fn play(ctx: Arc<Context>, command: ApplicationCommand, args: PlayArgs
         Ok(song) => {
             let input = Input::from(song);
 
-            if let Some(call_lock) = ctx.songbird.get(guild_id.get()) {
+            if let Some(call_lock) = ctx.songbird.get(guild_id) {
                 let mut call = call_lock.lock().await;
                 let empty = call.queue().is_empty();
 
@@ -167,12 +166,12 @@ struct TrackStart(Arc<Context>);
 #[async_trait]
 impl EventHandler for TrackStart {
     async fn act(&self, ctx: &songbird::EventContext<'_>) -> Option<songbird::Event> {
-        if let EventContext::Track(&[(state, track)]) = ctx {
+        if let EventContext::Track(&[(_, track)]) = ctx {
             info!("Changing activity");
 
             let metadata = track.metadata();
 
-            let mut metadata_str = match (&metadata.track, &metadata.artist, &metadata.title) {
+            let metadata_str = match (&metadata.track, &metadata.artist, &metadata.title) {
                 (Some(track), Some(artist), _) => format!("🎵 {} - {} 🎵", artist, track),
                 (.., Some(title)) => format!("🎵 {} 🎵", title),
                 _ => "🎵 UNKNOWN 🎵".to_string(),

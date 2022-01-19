@@ -1,19 +1,18 @@
-use std::collections::VecDeque;
 use std::sync::Arc;
 
 use crate::{osu_irc::IrcClient, stats::BotStats};
 use crate::{BotResult, Database};
 
+use hashbrown::HashSet;
 use parking_lot::RwLock;
 use rosu_v2::Osu as OsuClient;
-use songbird::tracks::LoopState;
-use songbird::EventHandler;
-use songbird::{tracks::TrackHandle, Songbird};
+use songbird::Songbird;
 use twilight_cache_inmemory::InMemoryCache;
 use twilight_gateway::Cluster;
 use twilight_http::Client as HttpClient;
 use twilight_model::gateway::payload::UpdatePresence;
 use twilight_model::gateway::presence::{Activity, ActivityType, Status};
+use twilight_model::id::GuildId;
 use twilight_standby::Standby;
 
 pub struct Context {
@@ -23,6 +22,7 @@ pub struct Context {
     pub irc: IrcClient,
     pub cluster: Cluster,
     pub http: HttpClient,
+    pub servers: RwLock<HashSet<GuildId>>,
     pub songbird: Songbird,
     pub standby: Standby,
     pub stats: BotStats,

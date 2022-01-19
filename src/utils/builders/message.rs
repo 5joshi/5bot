@@ -31,8 +31,12 @@ impl<'c> MessageBuilder<'c> {
     }
 
     pub fn error(mut self, embed: impl IntoEmbed) -> Self {
-        self.embed.replace(embed.into_embed());
-        self.embed.as_mut().map(|e| e.color = Some(RED));
+        let embed = self.embed.insert(embed.into_embed());
+        embed.color = Some(RED);
+        info!(
+            "Returned error message \"{}\"",
+            embed.description.as_ref().unwrap()
+        );
 
         self
     }

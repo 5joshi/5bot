@@ -1,11 +1,10 @@
 use std::sync::Arc;
 
+use songbird::tracks::TrackError;
 use twilight_model::application::{
-    command::{
-        CommandOption, CommandOptionValue as CommandOptionValueLiteral, NumberCommandOptionData,
-    },
+    command::{ChoiceCommandOptionData, CommandOption},
     interaction::{
-        application_command::{CommandData, CommandOptionValue},
+        application_command::{CommandData, CommandDataOption},
         ApplicationCommand,
     },
 };
@@ -27,12 +26,12 @@ pub struct SkipArgs {
 }
 
 impl SkipArgs {
-    async fn parse_options(_: Arc<Context>, data: &mut CommandData) -> BotResult<Self> {
-        for option in data.options.iter() {
-            if let CommandOptionValue::Integer(amount) = option.value {
-                if option.name == "amount" {
+    async fn parse_options(_: Arc<Context>, data: CommandData) -> BotResult<Self> {
+        for option in data.options {
+            if let CommandDataOption::Integer { name, value } = option {
+                if name == "amount" {
                     return Ok(Self {
-                        amount: amount as usize,
+                        amount: value.max(0) as usize,
                     });
                 }
             }
@@ -43,12 +42,9 @@ impl SkipArgs {
 }
 
 fn skip_options() -> Vec<CommandOption> {
-    let option_data = NumberCommandOptionData {
-        autocomplete: false,
+    let option_data = ChoiceCommandOptionData {
         choices: vec![],
         description: "Specify a number of songs to skip, skips one by default".to_string(),
-        max_value: None,
-        min_value: Some(CommandOptionValueLiteral::Integer(1)),
         name: "amount".to_string(),
         required: false,
     };
@@ -58,29 +54,57 @@ fn skip_options() -> Vec<CommandOption> {
 
 pub async fn skip(ctx: Arc<Context>, command: ApplicationCommand, args: SkipArgs) -> BotResult<()> {
     let SkipArgs { amount } = args;
-    info!("Skipping {} song(s) in song queue...", amount);
     if amount == 0 {
         let builder = MessageBuilder::new().error("Stop trying to break the bot.");
         return command.create_message(&ctx, builder).await;
     }
 
-    if let Some(call) = ctx.songbird.get(command.guild_id.unwrap().get()) {
+    let author_id = command.user_id()?;
+    let guild_id = command.guild_id.expect("Missing Guild ID for play command");
+
+    if let Some(call) = ctx.songbird.get(command.guild_id.unwrap()) {
         let call = call.lock().await;
+        let channel_opt = ctx
+            .cache
+            .voice_state(author_id, guild_id)
+            .and_then(|state| state.channel_id);
+
+        match (channel_opt, call.current_channel()) {
+            (Some(id1), Some(id2)) if id1.0 != id2.0 => {
+                let builder =
+                    MessageBuilder::new().error("You aren't in the same voice channel as me!");
+                return command.create_message(&ctx, builder).await;
+            }
+            (None, _) => {
+                let builder = MessageBuilder::new().error("You aren't in a voice channel!");
+                return command.create_message(&ctx, builder).await;
+            }
+            _ => {}
+        };
 
         if call.queue().is_empty() {
             let builder = MessageBuilder::new().error("No song is currently playing!");
             return command.create_message(&ctx, builder).await;
         }
 
-        for _ in 0..amount.min(call.queue().len()) {
-            let success = call.queue().skip();
-
-            if let Err(e) = success {
-                let builder =
-                    MessageBuilder::new().error("Failed to skip all of the songs! Blame Joshi :c");
-                let _ = command.create_message(&ctx, builder).await;
-                return Err(e.into());
+        info!("Skipping {} song(s) in song queue...", amount);
+        let result = call.queue().modify_queue(|q| {
+            for item in q.into_iter().take(amount) {
+                item.stop()?;
             }
+            q.rotate_left(amount);
+            q.truncate(q.len().saturating_sub(amount));
+            if let Some(item) = q.front() {
+                item.play()?;
+            }
+            Ok::<_, TrackError>(())
+        });
+
+        if let Err(e) = result {
+            let builder =
+                MessageBuilder::new().error("Failed to skip all of the songs! Blame Joshi :c");
+            let _ = command.create_message(&ctx, builder).await;
+            return Err(e.into());
         }
 
         let content = format!(

@@ -1,13 +1,18 @@
 use flexi_logger::{
     filter::{LogLineFilter, LogLineWriter},
-    Age, Cleanup, Criterion, DeferredNow, Duplicate, FileSpec, LogSpecification, Logger,
-    LoggerHandle, Naming,
+    Age, Cleanup, Criterion, DeferredNow, Duplicate, FileSpec, Logger, LoggerHandle, Naming,
 };
 use log::Record;
 use once_cell::sync::OnceCell;
 use std::io::{Result as IoResult, Write};
+use time::{format_description::FormatItem, macros::format_description};
 
 static LOGGER: OnceCell<LoggerHandle> = OnceCell::new();
+
+lazy_static! {
+    static ref FORMAT: &'static [FormatItem<'static>] =
+        format_description!("[year]-[month]-[day] [hour]:[minute]:[second]");
+}
 
 pub struct GoodCratesOnly;
 impl LogLineFilter for GoodCratesOnly {
@@ -49,7 +54,7 @@ pub fn log_format(w: &mut dyn Write, now: &mut DeferredNow, record: &Record) -> 
     write!(
         w,
         "[{}] {} {}",
-        now.now().format("%y-%m-%d %H:%M:%S"),
+        now.now().format(&FORMAT).unwrap(),
         record.level(),
         &record.args()
     )
@@ -59,7 +64,7 @@ pub fn log_format_files(w: &mut dyn Write, now: &mut DeferredNow, record: &Recor
     write!(
         w,
         "[{}] {:^5} [{}:{}] {}",
-        now.now().format("%y-%m-%d %H:%M:%S"),
+        now.now().format(&FORMAT).unwrap(),
         record.level(),
         record.file_static().unwrap_or_else(|| record.target()),
         record.line().unwrap_or(0),

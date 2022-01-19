@@ -17,6 +17,11 @@ pub const RED: u32 = 0xE74C3C;
 // Server ID
 pub const SERVER_ID: u64 = 277469642908237826;
 
+pub const NUMBER_EMOTES: [&str; 10] = [
+    ":zero:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:",
+    ":nine:",
+];
+
 // Message field sizes
 pub const DESCRIPTION_SIZE: usize = 2048;
 pub const FIELD_VALUE_SIZE: usize = 1024;

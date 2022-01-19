@@ -162,7 +162,7 @@ impl ToTokens for Command {
                             id: None,
                             kind: ::twilight_model::application::command::CommandType::ChatInput,
                             options: #options_name(),
-                            version: ::twilight_model::id::CommandVersionId::new(1).unwrap()
+                            // version: ::twilight_model::id::CommandVersionId::new(1).unwrap()
                         }
                     }
                 }
@@ -180,7 +180,7 @@ impl ToTokens for Command {
                             id: None,
                             kind: ::twilight_model::application::command::CommandType::ChatInput,
                             options: Vec::new(),
-                            version: ::twilight_model::id::CommandVersionId::new(1).unwrap()
+                            // version: ::twilight_model::id::CommandVersionId::new(1).unwrap()
                         }
                     }
                 }
@@ -195,7 +195,9 @@ impl ToTokens for Command {
                     pub fn run(ctx: ::std::sync::Arc<crate::Context>, mut command: ::twilight_model::application::interaction::ApplicationCommand) -> #fut_name<'static> {
                         use futures::TryFutureExt;
 
-                        let fut = #args_name::parse_options(Arc::clone(&ctx), &mut command.data)
+                        let data = ::std::mem::take(&mut command.data);
+
+                        let fut = #args_name::parse_options(Arc::clone(&ctx), data)
                             .and_then(|args| #run_name(ctx, command, args))
                             .map_err(Box::new)
                             .map_err(|src| crate::Error::Command {

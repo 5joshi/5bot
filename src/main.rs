@@ -1,3 +1,5 @@
+#![allow(warnings)]
+
 macro_rules! unwind_error {
     ($log:ident, $err:ident, $($arg:tt)+) => {
         {
@@ -27,12 +29,13 @@ use database::Database;
 use error::{BotResult, Error};
 
 use futures::StreamExt;
+use hashbrown::HashSet;
 use osu_irc::IrcClient;
 use parking_lot::RwLock;
 use rosu_v2::Osu;
 use songbird::Songbird;
 use stats::BotStats;
-use std::{collections::VecDeque, env, sync::Arc};
+use std::{env, sync::Arc};
 use twilight_cache_inmemory::{InMemoryCache, ResourceType};
 use twilight_gateway::{cluster::Events, Cluster, Event, EventTypeFlags, Intents};
 use twilight_http::Client as HttpClient;
@@ -43,7 +46,7 @@ use twilight_model::{
 };
 use twilight_standby::Standby;
 
-use crate::{commands::handle_interaction, utils::SERVER_ID};
+use crate::commands::handle_interaction;
 
 #[macro_use]
 extern crate async_trait;
@@ -112,6 +115,7 @@ async fn async_main() -> BotResult<()> {
         .await?;
     cluster.up().await;
 
+    let servers = RwLock::new(HashSet::new());
     let songbird = Songbird::twilight(cluster.clone(), user_id);
     let cache = InMemoryCache::builder()
         .resource_types(ResourceType::CHANNEL | ResourceType::GUILD | ResourceType::VOICE_STATE)
@@ -130,9 +134,11 @@ async fn async_main() -> BotResult<()> {
 
     let commands = commands::twilight_commands();
 
-    http.set_guild_commands(GuildId(SERVER_ID), &commands)?
-        .exec()
-        .await?;
+    for id in [297072529426612224, 491523078031933442] {
+        http.set_guild_commands(GuildId(id), &commands)?
+            .exec()
+            .await?;
+    }
 
     http.set_global_commands(&[])?.exec().await?;
 
@@ -154,6 +160,7 @@ async fn async_main() -> BotResult<()> {
         http,
         irc,
         osu,
+        servers,
         songbird,
         standby,
         stats,
@@ -170,10 +177,11 @@ async fn async_main() -> BotResult<()> {
     ctx.cluster.down();
 
     info!("Clearing song queue...");
-    let guilds = ctx.cache.iter().guilds();
-    if let Some(call) = ctx.songbird.get(SERVER_ID) {
-        let call = call.lock().await;
-        call.queue().stop();
+    for server in ctx.servers.read().iter() {
+        if let Some(call) = ctx.songbird.get(server.0) {
+            let call = call.lock().await;
+            call.queue().stop();
+        }
     }
 
     Ok(())
@@ -217,6 +225,12 @@ async fn handle_event(ctx: Arc<Context>, event: Event, shard_id: u64) -> BotResu
         Event::GatewayReconnect => {
             info!("Gateway requested shard {} to reconnect", shard_id);
             ctx.stats.event_counts.gateway_reconnect.inc();
+        }
+        Event::GuildCreate(e) => {
+            ctx.servers.write().insert(e.id);
+        }
+        Event::GuildDelete(e) => {
+            ctx.servers.write().remove(&e.id);
         }
         Event::InteractionCreate(e) => {
             if let Interaction::ApplicationCommand(command) = e.0 {

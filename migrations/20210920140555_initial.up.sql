@@ -10,6 +10,7 @@ CREATE TABLE manual_links (
 
 CREATE TABLE messages (
     id INT8 NOT NULL PRIMARY KEY,
+    guild_id INT8,
     channel_id INT8 NOT NULL,
     author INT8 NOT NULL,
     content TEXT NOT NULL,

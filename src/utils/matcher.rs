@@ -1,6 +1,5 @@
 use regex::Regex;
-use rosu_v2::model::GameMods;
-use std::{borrow::Cow, str::FromStr};
+use std::borrow::Cow;
 
 pub fn is_custom_emote(msg: &str) -> bool {
     EMOJI_MATCHER.is_match(msg)

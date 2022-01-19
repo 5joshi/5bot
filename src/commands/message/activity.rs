@@ -2,7 +2,7 @@ use std::{borrow::Cow, sync::Arc};
 
 use twilight_model::{
     application::{
-        command::{BaseCommandOptionData, ChannelCommandOptionData, CommandOption},
+        command::{ChannelCommandOptionData, CommandOption},
         interaction::{
             application_command::{CommandData, InteractionChannel},
             ApplicationCommand,
@@ -31,7 +31,7 @@ pub struct ActivityArgs {
 }
 
 impl ActivityArgs {
-    async fn parse_options(_: Arc<Context>, data: &mut CommandData) -> BotResult<Self> {
+    async fn parse_options(_: Arc<Context>, data: CommandData) -> BotResult<Self> {
         let channel = data.resolved.and_then(|mut data| data.channels.pop());
         Ok(Self { channel })
     }
@@ -39,6 +39,7 @@ impl ActivityArgs {
 
 fn activity_options() -> Vec<CommandOption> {
     let option_data = ChannelCommandOptionData {
+        channel_types: vec![ChannelType::GuildText],
         description: "Specify an optional channel to check the activity for".to_string(),
         name: "channel".to_string(),
         required: false,
@@ -73,7 +74,10 @@ async fn activity(
     } else {
         let activity = ctx
             .database
-            .get_activity(args.channel.as_ref().map(|c| c.id))
+            .get_activity(
+                command.guild_id.unwrap(),
+                args.channel.as_ref().map(|c| c.id),
+            )
             .await?;
 
         let name = args

@@ -8,7 +8,7 @@ DROP TABLE unchecked_members;
 
 DROP TABLE skins;
 
-DROP INDEX osuvs_scores_map_id ON osuvs_scores;
+DROP INDEX osuvs_scores_map_id;
 
 DROP TABLE osuvs_scores;
 
