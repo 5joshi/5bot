@@ -10,6 +10,7 @@ $ sqlx migrate run
 ```
 
 ## Cross Compilation for Raspberry PI
+Change database, change global/client commands
 ```sh
 $ export OPUS_LIB_DIR=/mnt/c/Users/5joshi/libopus/
 $ export OPUS_NO_PKG=1 
@@ -20,9 +21,10 @@ $ scp /target/arm-unknown-linux-gnueabihf/release/fivebot pi@192.168.1.103:/home
 
 ## Running on Raspberry PI
 ```sh
-$ tmux new -s 5joshi
+$ ssh pi@192.168.1.103
+$ tmux new -s fivebot
 $ cd Desktop
 $ ./fivebot
 # ctrl+B - D -- to leave tmux session
-# tmux attach -t 5joshi -- to enter tmux session
+# tmux attach -t fivebot -- to enter tmux session
 ```

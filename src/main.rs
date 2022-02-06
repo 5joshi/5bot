@@ -135,12 +135,12 @@ async fn async_main() -> BotResult<()> {
     let commands = commands::twilight_commands();
 
     for id in [297072529426612224, 491523078031933442] {
-        http.set_guild_commands(GuildId(id), &commands)?
+        http.set_guild_commands(GuildId(id), &[])?
             .exec()
             .await?;
     }
 
-    http.set_global_commands(&[])?.exec().await?;
+    http.set_global_commands(&commands)?.exec().await?;
 
     let osu = Osu::new(client_id, client_secret).await?;
 
