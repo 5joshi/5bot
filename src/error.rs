@@ -1,5 +1,6 @@
 use chrono::ParseError;
 use irc::error::Error as IrcError;
+use regex::Error as RegexError;
 use reqwest::Error as ReqwestError;
 use rosu_pp::ParseError as RosuParseError;
 use rosu_v2::prelude::OsuError;
@@ -58,6 +59,8 @@ pub enum Error {
     ParseFloat(#[from] ParseFloatError),
     #[error("Failed to parse timestamp with chrono.")]
     ParseTime(#[from] ParseError),
+    #[error("Regex error")]
+    Regex(#[from] RegexError),
     #[error("Error when parsing with rosu.")]
     RosuParse(#[from] RosuParseError),
     #[error("Error when using method on songbird track.")]

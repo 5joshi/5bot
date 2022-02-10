@@ -11,6 +11,7 @@ use twilight_model::application::{command::Command, interaction::ApplicationComm
 use utils::{Ping, Roll};
 
 use crate::{
+    commands::message::{Complete, Impersonate},
     context::Context,
     error::{BotResult, Error},
     utils::ApplicationCommandExt,
@@ -22,6 +23,8 @@ use self::music::{Pause, Play, Queue, Skip, Stop, Volume};
 pub fn twilight_commands() -> Vec<Command> {
     vec![
         Clear::define(),
+        Complete::define(),
+        Impersonate::define(),
         Pause::define(),
         Ping::define(),
         Play::define(),
@@ -31,7 +34,6 @@ pub fn twilight_commands() -> Vec<Command> {
         Volume::define(),
         Roll::define(),
         Activity::define(),
-        // Music::define(),
     ]
 }
 
@@ -63,8 +65,9 @@ pub async fn handle_interaction(ctx: Arc<Context>, command: ApplicationCommand) 
     match name {
         Activity::NAME => Activity::run(ctx, command).await,
         Clear::NAME => Clear::run(ctx, command).await,
+        Complete::NAME => Complete::run(ctx, command).await,
+        Impersonate::NAME => Impersonate::run(ctx, command).await,
         Pause::NAME => Pause::run(ctx, command).await,
-        // Music::NAME => Music::run(ctx, command).await,
         Ping::NAME => Ping::run(ctx, command).await,
         Play::NAME => Play::run(ctx, command).await,
         Queue::NAME => Queue::run(ctx, command).await,

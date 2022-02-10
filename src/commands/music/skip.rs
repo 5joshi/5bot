@@ -55,7 +55,7 @@ fn skip_options() -> Vec<CommandOption> {
 pub async fn skip(ctx: Arc<Context>, command: ApplicationCommand, args: SkipArgs) -> BotResult<()> {
     let SkipArgs { amount } = args;
     if amount == 0 {
-        let builder = MessageBuilder::new().error("Stop trying to break the bot.");
+        let builder = MessageBuilder::new().error("Stop trying to break the bot >:(");
         return command.create_message(&ctx, builder).await;
     }
 

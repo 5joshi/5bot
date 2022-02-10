@@ -1,9 +1,10 @@
 use chrono::{DateTime, Duration, Utc};
 use futures::StreamExt;
+use regex::{escape, Regex};
 use sqlx::Row;
 use twilight_model::{
     channel::Message,
-    id::{ChannelId, GuildId},
+    id::{ChannelId, GuildId, UserId},
 };
 
 use crate::{commands::MessageActivity, database::Database, error::BotResult};
@@ -22,6 +23,91 @@ impl Database {
         );
         let result = query.execute(&self.pool).await?;
         Ok(result.rows_affected() == 1)
+    }
+
+    pub async fn get_messages(
+        &self,
+        author: Option<UserId>,
+        channel: Option<ChannelId>,
+        guild: GuildId,
+    ) -> BotResult<Vec<String>> {
+        let author = author.map(|a| a.0 as i64);
+        let channel = channel.map(|a| a.0 as i64);
+        let guild = guild.0 as i64;
+        match (author, channel) {
+            (Some(a), Some(c)) => {
+                let mut stream = sqlx::query!(
+                    "SELECT content FROM messages WHERE author = $1 AND channel_id = $2",
+                    a,
+                    c
+                )
+                .fetch(&self.pool);
+                let mut messages = Vec::new();
+                while let Some(entry) = stream.next().await.transpose()? {
+                    messages.push(entry.content)
+                }
+                Ok(messages)
+            }
+            (Some(a), None) => {
+                let mut stream = sqlx::query!("SELECT content FROM messages WHERE author = $1", a)
+                    .fetch(&self.pool);
+                let mut messages = Vec::new();
+                while let Some(entry) = stream.next().await.transpose()? {
+                    messages.push(entry.content)
+                }
+                Ok(messages)
+            }
+            (None, Some(c)) => {
+                let mut stream = sqlx::query!(
+                    "SELECT content FROM messages WHERE channel_id = $1 AND bot = false",
+                    c
+                )
+                .fetch(&self.pool);
+                let mut messages = Vec::new();
+                while let Some(entry) = stream.next().await.transpose()? {
+                    messages.push(entry.content)
+                }
+                Ok(messages)
+            }
+            (None, None) => {
+                let mut stream = sqlx::query!(
+                    "SELECT content FROM messages WHERE guild_id = $1 AND bot = false",
+                    guild
+                )
+                .fetch(&self.pool);
+                let mut messages = Vec::new();
+                while let Some(entry) = stream.next().await.transpose()? {
+                    messages.push(entry.content)
+                }
+                Ok(messages)
+            }
+        }
+    }
+
+    pub async fn get_complete_messages(
+        &self,
+        author: Option<UserId>,
+        channel: Option<ChannelId>,
+        contains: &str,
+        guild: GuildId,
+    ) -> BotResult<Vec<String>> {
+        let re = Regex::new(&format!(r".*{}.*", escape(contains)))?;
+        let mut messages = self.get_messages(author, channel, guild).await?;
+        messages.retain(|m| re.is_match(m));
+        Ok(messages)
+    }
+
+    pub async fn get_regex_messages(
+        &self,
+        author: Option<UserId>,
+        channel: Option<ChannelId>,
+        regex: &str,
+        guild: GuildId,
+    ) -> BotResult<Vec<String>> {
+        let re = Regex::new(&format!(r"{}", regex))?;
+        let mut messages = self.get_messages(author, channel, guild).await?;
+        messages.retain(|m| re.is_match(m));
+        Ok(messages)
     }
 
     /// Retrieve message counts from the past month, week, day and hour in that exact order.
