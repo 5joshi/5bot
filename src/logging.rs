@@ -32,7 +32,7 @@ impl LogLineFilter for GoodCratesOnly {
 pub fn initialize() {
     let file_spec = FileSpec::default().directory("logs");
 
-    let logger_handle = Logger::try_with_str("osubelgiumbot")
+    let logger_handle = Logger::try_with_str("fivebot")
         .unwrap()
         .filter(Box::new(GoodCratesOnly))
         .log_to_file(file_spec)

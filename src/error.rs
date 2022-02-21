@@ -41,6 +41,8 @@ pub enum Error {
     DeserializeBody(#[from] DeserializeBodyError),
     #[error("Failed to interact with Discord.")]
     Interaction(#[from] InteractionError),
+    #[error("I/O error.")]
+    Io(#[from] IoError),
     #[error("Failed to communicate with osu! IRC.")]
     Irc(#[from] IrcError),
     #[error("Failed to join discord voicechat.")]
@@ -61,6 +63,8 @@ pub enum Error {
     ParseTime(#[from] ParseError),
     #[error("Regex error")]
     Regex(#[from] RegexError),
+    #[error("Reqwest error.")]
+    Reqwest(#[from] ReqwestError),
     #[error("Error when parsing with rosu.")]
     RosuParse(#[from] RosuParseError),
     #[error("Error when using method on songbird track.")]

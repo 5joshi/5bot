@@ -17,7 +17,7 @@ flexi_logger = { version = "0.19", default-features = false, features = [
 ] }
 futures = "0.3.17"
 hashbrown = "0.11"
-irc = "0.15"
+irc = { version = "0.15", default-features = false, features = ["tls-rust"] }
 lazy_static = "1.4.0"
 log = "0.4.0"
 markov = "1.0"
@@ -49,14 +49,14 @@ sqlx = { version = "0.5", default-features = false, features = [
     "macros",
     "migrate",
     "postgres",
-    "runtime-tokio-native-tls",
+    "runtime-tokio-rustls",
 ] }
 time = { version = "0.3", features = ["macros", "parsing"] }
 thiserror = "1.0"
 tokio = { version = "1.11.0", features = ["full"] }
 twilight-cache-inmemory = "0.6"
-twilight-gateway = "0.6"
-twilight-http = "0.6"
+twilight-gateway = { version = "0.6", features = ["rustls-webpki-roots"] }
+twilight-http = { version = "0.6", features = ["rustls-webpki-roots"] }
 twilight-model = "0.6"
 twilight-standby = "0.6"
 

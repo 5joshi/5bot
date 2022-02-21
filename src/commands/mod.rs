@@ -11,7 +11,10 @@ use twilight_model::application::{command::Command, interaction::ApplicationComm
 use utils::{Ping, Roll};
 
 use crate::{
-    commands::message::{Complete, Impersonate},
+    commands::{
+        message::{Complete, Impersonate},
+        osu::Suijisim,
+    },
     context::Context,
     error::{BotResult, Error},
     utils::ApplicationCommandExt,
@@ -31,6 +34,7 @@ pub fn twilight_commands() -> Vec<Command> {
         Queue::define(),
         Skip::define(),
         Stop::define(),
+        Suijisim::define(),
         Volume::define(),
         Roll::define(),
         Activity::define(),
@@ -73,6 +77,7 @@ pub async fn handle_interaction(ctx: Arc<Context>, command: ApplicationCommand) 
         Queue::NAME => Queue::run(ctx, command).await,
         Skip::NAME => Skip::run(ctx, command).await,
         Stop::NAME => Stop::run(ctx, command).await,
+        Suijisim::NAME => Suijisim::run(ctx, command).await,
         Volume::NAME => Volume::run(ctx, command).await,
         Roll::NAME => Roll::run(ctx, command).await,
         _ => Err(Error::UnknownInteraction {

@@ -139,15 +139,16 @@ async fn async_main() -> BotResult<()> {
         491523078031933442,
         // 277469642908237826,
         // 756451036750938123,
+        // 536598538293870614,
     ] {
-        http.set_guild_commands(GuildId(id), &commands)?
-            .exec()
-            .await?;
-        // http.set_guild_commands(GuildId(id), &[])?.exec().await?;
+        // http.set_guild_commands(GuildId(id), &commands)?
+        //     .exec()
+        //     .await?;
+        http.set_guild_commands(GuildId(id), &[])?.exec().await?;
     }
 
-    http.set_global_commands(&[])?.exec().await?;
-    // http.set_global_commands(&commands)?.exec().await?;
+    // http.set_global_commands(&[])?.exec().await?;
+    http.set_global_commands(&commands)?.exec().await?;
 
     let osu = Osu::new(client_id, client_secret).await?;
 
@@ -160,11 +161,29 @@ async fn async_main() -> BotResult<()> {
 
     let stats = BotStats::new(osu.metrics());
 
+    // //TODO: make this prettier
+    // let secret = yup_oauth2::ApplicationSecret {
+    //     client_id: env::var("GOOGLE_CLIENT_ID")
+    //         .expect("Missing environment variable (GOOGLE_CLIENT_ID)."),
+    //     client_secret: env::var("GOOGLE_CLIENT_SECRET")
+    //         .expect("Missing environment variable (GOOGLE_CLIENT_SECRET)."),
+    //     ..Default::default()
+    // };
+    // let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+    //     secret,
+    //     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+    // )
+    // .build()
+    // .await?;
+    // let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
+    // let mut hub = Sheets::new(client, auth);
+
     let ctx = Context {
         cache,
         cluster,
         database,
         http,
+        // hub,
         irc,
         osu,
         servers,

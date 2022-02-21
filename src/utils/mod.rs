@@ -3,12 +3,14 @@ mod datetime;
 mod ext;
 pub mod matcher;
 pub mod numbers;
+mod spreadsheet;
 
 pub use builders::author::Author;
 pub use builders::embed::EmbedBuilder;
 pub use builders::footer::Footer;
 pub use builders::message::MessageBuilder;
 pub use ext::ApplicationCommandExt;
+pub use spreadsheet::BatchGetResponse;
 
 // Colors
 pub const DARK_GREEN: u32 = 0x1F8B4C;
@@ -25,6 +27,10 @@ pub const NUMBER_EMOTES: [&str; 10] = [
 // Message field sizes
 pub const DESCRIPTION_SIZE: usize = 2048;
 pub const FIELD_VALUE_SIZE: usize = 1024;
+
+// spreadsheets
+pub const SPREADSHEET_BASE: &str = "https://content-sheets.googleapis.com/v4/spreadsheets/";
+pub const BST_SPREADSHEET_ID: &str = "1W-2_BYSitzGmloWsnvSw6dyDG9STctshudWFVwtHCkQ";
 
 // osu!
 pub const OSU_BASE: &str = "https://osu.ppy.sh/";

@@ -37,7 +37,7 @@ impl Database {
         match (author, channel) {
             (Some(a), Some(c)) => {
                 let mut stream = sqlx::query!(
-                    "SELECT content FROM messages WHERE author = $1 AND channel_id = $2",
+                    "SELECT content FROM messages WHERE author = $1 AND channel_id = $2 AND content != ''",
                     a,
                     c
                 )
@@ -49,8 +49,11 @@ impl Database {
                 Ok(messages)
             }
             (Some(a), None) => {
-                let mut stream = sqlx::query!("SELECT content FROM messages WHERE author = $1", a)
-                    .fetch(&self.pool);
+                let mut stream = sqlx::query!(
+                    "SELECT content FROM messages WHERE author = $1 AND content != ''",
+                    a
+                )
+                .fetch(&self.pool);
                 let mut messages = Vec::new();
                 while let Some(entry) = stream.next().await.transpose()? {
                     messages.push(entry.content)
@@ -59,7 +62,7 @@ impl Database {
             }
             (None, Some(c)) => {
                 let mut stream = sqlx::query!(
-                    "SELECT content FROM messages WHERE channel_id = $1 AND bot = false",
+                    "SELECT content FROM messages WHERE channel_id = $1 AND bot = false AND content != ''",
                     c
                 )
                 .fetch(&self.pool);
@@ -71,7 +74,7 @@ impl Database {
             }
             (None, None) => {
                 let mut stream = sqlx::query!(
-                    "SELECT content FROM messages WHERE guild_id = $1 AND bot = false",
+                    "SELECT content FROM messages WHERE guild_id = $1 AND bot = false AND content != ''",
                     guild
                 )
                 .fetch(&self.pool);

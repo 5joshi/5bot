@@ -12,6 +12,7 @@ $ sqlx migrate run
 ## Cross Compilation for Raspberry PI
 Change database, change global/client commands
 ```sh
+$ sudo /etc/init.d/postgresql start
 $ export OPUS_LIB_DIR=/mnt/c/Users/5joshi/libopus/
 $ export OPUS_NO_PKG=1 
 $ export OPUS_STATIC=1

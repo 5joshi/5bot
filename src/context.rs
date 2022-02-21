@@ -22,6 +22,7 @@ pub struct Context {
     pub irc: IrcClient,
     pub cluster: Cluster,
     pub http: HttpClient,
+    // pub hub: Sheets,
     pub servers: RwLock<HashSet<GuildId>>,
     pub songbird: Songbird,
     pub standby: Standby,
