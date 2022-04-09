@@ -24,7 +24,7 @@ pub struct Suijisim;
 
 async fn suijisim(ctx: Arc<Context>, command: ApplicationCommand) -> BotResult<()> {
     let req = format!(
-        "{}{}/values:batchGet?ranges=Signups!H5%3AH84&key={}",
+        "{}{}/values:batchGet?ranges=Players!H9%3AH72&key={}",
         SPREADSHEET_BASE,
         BST_SPREADSHEET_ID,
         env::var("GOOGLE_API_KEY").expect("Missing environment variable (GOOGLE_API_KEY).")
@@ -38,7 +38,7 @@ async fn suijisim(ctx: Arc<Context>, command: ApplicationCommand) -> BotResult<(
         .map(|vr| vr.values.into_iter().flatten().collect::<Vec<_>>());
 
     if let Some(mut players) = req_players {
-        let mut iter = players.chunks_exact_mut(20);
+        let mut iter = players.chunks_exact_mut(16);
 
         let a = iter.next();
         let b = iter.next();
@@ -54,7 +54,7 @@ async fn suijisim(ctx: Arc<Context>, command: ApplicationCommand) -> BotResult<(
                     c.shuffle(&mut rng);
                     d.shuffle(&mut rng);
                 }
-                let mut fields: Vec<EmbedField> = (0..10)
+                let mut fields: Vec<EmbedField> = (0..8)
                     .map(|idx| EmbedField {
                         inline: true,
                         name: format!("Team {}", idx + 1),

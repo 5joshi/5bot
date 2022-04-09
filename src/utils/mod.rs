@@ -30,7 +30,7 @@ pub const FIELD_VALUE_SIZE: usize = 1024;
 
 // spreadsheets
 pub const SPREADSHEET_BASE: &str = "https://content-sheets.googleapis.com/v4/spreadsheets/";
-pub const BST_SPREADSHEET_ID: &str = "1W-2_BYSitzGmloWsnvSw6dyDG9STctshudWFVwtHCkQ";
+pub const BST_SPREADSHEET_ID: &str = "1RlEp6WS6Lbxty52_chJC-brfomryk__2fcVIS-O4gBs";
 
 // osu!
 pub const OSU_BASE: &str = "https://osu.ppy.sh/";
