@@ -1,9 +1,11 @@
 mod builders;
+mod cow;
 mod datetime;
 mod ext;
 pub mod matcher;
 pub mod numbers;
 mod spreadsheet;
+mod uberduck;
 
 pub use builders::author::Author;
 pub use builders::embed::EmbedBuilder;
@@ -11,6 +13,7 @@ pub use builders::footer::Footer;
 pub use builders::message::MessageBuilder;
 pub use ext::ApplicationCommandExt;
 pub use spreadsheet::BatchGetResponse;
+pub use uberduck::{SpeakResponse, SpeakStatusResponse};
 
 // Colors
 pub const DARK_GREEN: u32 = 0x1F8B4C;
@@ -31,6 +34,9 @@ pub const FIELD_VALUE_SIZE: usize = 1024;
 // spreadsheets
 pub const SPREADSHEET_BASE: &str = "https://content-sheets.googleapis.com/v4/spreadsheets/";
 pub const BST_SPREADSHEET_ID: &str = "1RlEp6WS6Lbxty52_chJC-brfomryk__2fcVIS-O4gBs";
+
+// uberduck
+pub const UBERDUCK_BASE: &str = "https://api.uberduck.ai/";
 
 // osu!
 pub const OSU_BASE: &str = "https://osu.ppy.sh/";

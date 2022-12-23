@@ -32,6 +32,7 @@ use futures::StreamExt;
 use hashbrown::HashSet;
 use osu_irc::IrcClient;
 use parking_lot::RwLock;
+use reqwest::Client;
 use rosu_v2::Osu;
 use songbird::Songbird;
 use stats::BotStats;
@@ -161,25 +162,11 @@ async fn async_main() -> BotResult<()> {
 
     let stats = BotStats::new(osu.metrics());
 
-    // //TODO: make this prettier
-    // let secret = yup_oauth2::ApplicationSecret {
-    //     client_id: env::var("GOOGLE_CLIENT_ID")
-    //         .expect("Missing environment variable (GOOGLE_CLIENT_ID)."),
-    //     client_secret: env::var("GOOGLE_CLIENT_SECRET")
-    //         .expect("Missing environment variable (GOOGLE_CLIENT_SECRET)."),
-    //     ..Default::default()
-    // };
-    // let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-    //     secret,
-    //     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-    // )
-    // .build()
-    // .await?;
-    // let client = hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots());
-    // let mut hub = Sheets::new(client, auth);
+    let client = Client::new();
 
     let ctx = Context {
         cache,
+        client,
         cluster,
         database,
         http,

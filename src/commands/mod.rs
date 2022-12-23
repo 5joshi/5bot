@@ -21,7 +21,7 @@ use crate::{
 };
 pub use message::MessageActivity;
 
-use self::music::{Pause, Play, Queue, Skip, Stop, Volume};
+use self::music::{Pause, Play, Queue, Skip, Stop, Tts, Volume};
 
 pub fn twilight_commands() -> Vec<Command> {
     vec![
@@ -35,6 +35,7 @@ pub fn twilight_commands() -> Vec<Command> {
         Skip::define(),
         Stop::define(),
         Suijisim::define(),
+        Tts::define(),
         Volume::define(),
         Roll::define(),
         Activity::define(),
@@ -78,6 +79,7 @@ pub async fn handle_interaction(ctx: Arc<Context>, command: ApplicationCommand) 
         Skip::NAME => Skip::run(ctx, command).await,
         Stop::NAME => Stop::run(ctx, command).await,
         Suijisim::NAME => Suijisim::run(ctx, command).await,
+        Tts::NAME => Tts::run(ctx, command).await,
         Volume::NAME => Volume::run(ctx, command).await,
         Roll::NAME => Roll::run(ctx, command).await,
         _ => Err(Error::UnknownInteraction {

@@ -5,6 +5,7 @@ use crate::{BotResult, Database};
 
 use hashbrown::HashSet;
 use parking_lot::RwLock;
+use reqwest::Client;
 use rosu_v2::Osu as OsuClient;
 use songbird::Songbird;
 use twilight_cache_inmemory::InMemoryCache;
@@ -17,6 +18,7 @@ use twilight_standby::Standby;
 
 pub struct Context {
     pub cache: InMemoryCache,
+    pub client: Client,
     pub database: Database,
     pub osu: OsuClient,
     pub irc: IrcClient,
