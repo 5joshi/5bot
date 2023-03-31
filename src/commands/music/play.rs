@@ -94,11 +94,12 @@ pub async fn play(ctx: Arc<Context>, command: ApplicationCommand, args: PlayArgs
 
     let PlayArgs { song } = args;
     let id = matcher::get_youtube_id(&song);
-    let yt_search = if let Some(_) = id {
-        song
-    } else {
-        format!("ytsearch1:{}", song)
-    };
+    let yt_search = song;
+    // let yt_search = if let Some(_) = id {
+    //     song
+    // } else {
+    //     format!("ytsearch1:{}", song)
+    // };
 
     match Restartable::ytdl_search(&yt_search, false).await {
         Ok(song) => {
