@@ -75,12 +75,13 @@ pub async fn play(ctx: Arc<Context>, command: ApplicationCommand, args: PlayArgs
     };
 
     let (_handle, success) = ctx.songbird.join(guild_id, channel_id).await;
+    // info!("Joined channel {}", channel_id);
 
-    if let Err(success) = success {
-        let builder = MessageBuilder::new().error("Failed to join voice channel! Blame Joshi :c");
-        let _ = command.update_message(&ctx, builder).await;
-        return Err(success.into());
-    }
+    // if let Err(success) = success {
+    //     let builder = MessageBuilder::new().error("Failed to join voice channel! Blame Joshi :c");
+    //     let _ = command.update_message(&ctx, builder).await;
+    //     return Err(success.into());
+    // }
 
     info!(
         "Joined channel {} after play command by {}",
@@ -103,9 +104,11 @@ pub async fn play(ctx: Arc<Context>, command: ApplicationCommand, args: PlayArgs
 
     match Restartable::ytdl_search(&yt_search, false).await {
         Ok(song) => {
+            // info!("In ytdl search");
             let input = Input::from(song);
 
             if let Some(call_lock) = ctx.songbird.get(guild_id) {
+                // info!("Got call lock");
                 let mut call = call_lock.lock().await;
                 let empty = call.queue().is_empty();
 
