@@ -8,7 +8,7 @@ use super::embed::EmbedBuilder;
 #[derive(Default)]
 pub struct MessageBuilder<'c> {
     pub content: Option<Cow<'c, str>>,
-    pub embed: Option<Embed>,
+    pub embeds: Vec<Embed>,
     pub file: Option<(&'static str, &'c [u8])>,
     pub components: Option<&'c [Component]>,
 }
@@ -25,18 +25,19 @@ impl<'c> MessageBuilder<'c> {
     }
 
     pub fn embed(mut self, embed: impl IntoEmbed) -> Self {
-        self.embed.replace(embed.into_embed());
+        self.embeds.push(embed.into_embed());
 
         self
     }
 
     pub fn error(mut self, embed: impl IntoEmbed) -> Self {
-        let embed = self.embed.insert(embed.into_embed());
+        let mut embed = embed.into_embed();
         embed.color = Some(RED);
         info!(
             "Returned error message \"{}\"",
             embed.description.as_ref().unwrap()
         );
+        self.embeds.push(embed);
 
         self
     }
@@ -59,7 +60,7 @@ impl<'c> From<Embed> for MessageBuilder<'c> {
     fn from(embed: Embed) -> Self {
         Self {
             content: None,
-            embed: Some(embed),
+            embeds: vec![embed],
             file: None,
             components: None,
         }

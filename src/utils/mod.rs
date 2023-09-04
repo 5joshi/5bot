@@ -33,7 +33,7 @@ pub const FIELD_VALUE_SIZE: usize = 1024;
 
 // spreadsheets
 pub const SPREADSHEET_BASE: &str = "https://content-sheets.googleapis.com/v4/spreadsheets/";
-pub const BST_SPREADSHEET_ID: &str = "1RlEp6WS6Lbxty52_chJC-brfomryk__2fcVIS-O4gBs";
+pub const SUIJI_SPREADSHEET_ID: &str = "1cFZQ0JonOEn-wzPbjcgLsvWjWJNmrjRxJvy8vLfzVZY";
 
 // uberduck
 pub const UBERDUCK_BASE: &str = "https://api.uberduck.ai/";

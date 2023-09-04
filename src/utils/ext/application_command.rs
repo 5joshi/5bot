@@ -1,6 +1,10 @@
 use std::{borrow::Cow, mem};
 
-use crate::{context::Context, utils::MessageBuilder, BotResult, Error};
+use crate::{
+    context::Context,
+    utils::{EmbedBuilder, MessageBuilder},
+    BotResult, Error,
+};
 
 use twilight_model::{
     application::{
@@ -63,7 +67,7 @@ impl ApplicationCommandExt for ApplicationCommand {
             allowed_mentions: None,
             components: None,
             content: builder.content.map(Cow::into_owned),
-            embeds: builder.embed.map_or_else(Vec::new, |e| vec![e]),
+            embeds: builder.embeds,
             flags: None,
             tts: None,
         });
@@ -104,7 +108,7 @@ impl ApplicationCommandExt for ApplicationCommand {
         ctx.http
             .update_interaction_original(&self.token)?
             .content(builder.content.as_deref())?
-            .embeds(builder.embed.as_ref().map(std::slice::from_ref))?
+            .embeds(Some(&builder.embeds))?
             .exec()
             .await?;
 
