@@ -24,7 +24,7 @@ pub struct Suijisim;
 
 async fn suijisim(ctx: Arc<Context>, command: ApplicationCommand) -> BotResult<()> {
     let req = format!(
-        "{}{}/values:batchGet?ranges=Players!F5%3AF132&ranges=Players!M5%3AM132&ranges=Players!T5%3AT132&ranges=Players!AA5%3AAA132&key={}",
+        "{}{}/values:batchGet?ranges=Registrations!N10:N137&ranges=Registrations!N138:N265&ranges=Registrations!N266:N393&ranges=Registrations!N394:N521&key={}",
         SPREADSHEET_BASE,
         SUIJI_SPREADSHEET_ID,
         env::var("GOOGLE_API_KEY").expect("Missing environment variable (GOOGLE_API_KEY).")
@@ -37,27 +37,23 @@ async fn suijisim(ctx: Arc<Context>, command: ApplicationCommand) -> BotResult<(
         .into_iter()
         .flat_map(|vr| vr.values.into_iter().flatten().collect::<Vec<_>>());
 
-    let mut iter = players.step_by(2);
-    let mut res = Vec::with_capacity(8);
+    let mut iter = players.step_by(1);
+    let mut res = Vec::with_capacity(4);
 
-    for _ in 0..8 {
-        res.push(iter.by_ref().take(32).collect::<Vec<_>>());
+    for _ in 0..4 {
+        res.push(iter.by_ref().take(64).collect::<Vec<_>>());
     }
 
-    let [a1, a2, b1, b2, c1, c2, d1, d2] = dbg!(res.as_mut_slice()) else {
+    let [a, b, c, d] = dbg!(res.as_mut_slice()) else {
         unreachable!()
     };
     {
         let mut rng = rand::thread_rng();
 
-        a1.shuffle(&mut rng);
-        a2.shuffle(&mut rng);
-        b1.shuffle(&mut rng);
-        b2.shuffle(&mut rng);
-        c1.shuffle(&mut rng);
-        c2.shuffle(&mut rng);
-        d1.shuffle(&mut rng);
-        d2.shuffle(&mut rng);
+        a.shuffle(&mut rng);
+        b.shuffle(&mut rng);
+        c.shuffle(&mut rng);
+        d.shuffle(&mut rng);
     }
     let mut fields1: Vec<EmbedField> = (0..16)
         .map(|idx| EmbedField {
@@ -65,7 +61,14 @@ async fn suijisim(ctx: Arc<Context>, command: ApplicationCommand) -> BotResult<(
             name: format!("Team {}", idx + 1),
             value: format!(
                 "```\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n```",
-                a1[idx], a2[idx], b1[idx], b2[idx], c1[idx], c2[idx], d1[idx], d2[idx],
+                a[idx * 2],
+                a[idx * 2 + 1],
+                b[idx * 2],
+                b[idx * 2 + 1],
+                c[idx * 2],
+                c[idx * 2 + 1],
+                d[idx * 2],
+                d[idx * 2 + 1],
             ),
         })
         .collect();
@@ -75,7 +78,14 @@ async fn suijisim(ctx: Arc<Context>, command: ApplicationCommand) -> BotResult<(
             name: format!("Team {}", idx + 1),
             value: format!(
                 "```\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n```",
-                a1[idx], a2[idx], b1[idx], b2[idx], c1[idx], c2[idx], d1[idx], d2[idx],
+                a[idx * 2],
+                a[idx * 2 + 1],
+                b[idx * 2],
+                b[idx * 2 + 1],
+                c[idx * 2],
+                c[idx * 2 + 1],
+                d[idx * 2],
+                d[idx * 2 + 1],
             ),
         })
         .collect();
